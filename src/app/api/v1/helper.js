@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient
+export const prisma = new PrismaClient()
 
 const op_map_prisma = {
     "eq" : "equals",

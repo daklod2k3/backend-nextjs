@@ -1,4 +1,4 @@
-import { prisma } from '@/app/auth/v1/helper.js';
+import { prisma } from '@/app/api/v1/helper.js';
 import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
 
@@ -13,7 +13,7 @@ export async function POST(req){
     })
 
     if (unique)
-        return NextResponse.json("Username already exist")
+        return NextResponse.json({ message: "Username already exist"}, {status: 400})
 
     try {
         const hash = await bcrypt.hash(password, Number(process.env.saltRound))
@@ -25,7 +25,9 @@ export async function POST(req){
             }
         })
 
-        return NextResponse.json(user)
+        return NextResponse.json({
+            message: true
+        }, { status: 200 })
         
     }catch (e){
         console.log(e);

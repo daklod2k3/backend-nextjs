@@ -1,4 +1,4 @@
-import { prisma, QueryConvert, QueryToPrismaSearch } from '@/app/auth/v1/helper';
+import { prisma, QueryConvert, QueryToPrismaSearch } from '@/app/api/v1/helper';
 import { NextResponse } from 'next/server';
 // export async function POST(req){
 

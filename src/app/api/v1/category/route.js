@@ -1,4 +1,4 @@
-import { prisma } from '@/app/auth/v1/helper.js';
+import { prisma } from '@/app/api/v1/helper.js';
 import { NextResponse } from 'next/server';
 
 // export async function POST(req){
