@@ -17,9 +17,9 @@ export async function POST(req){
     if (!user){
         return NextResponse.json({
             message: "Username or password invalid!"
-        }).status(200)
+        }).status(400)
     }
-    if (bcrypt.compare(password, user.password)){
+    if (await bcrypt.compare(password, user.password)){
         return NextResponse.json({
             message: true,
         }, {
