@@ -3,7 +3,7 @@ import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
 
 export async function POST(req){
-    const {username, password} = await req.json()
+    const {username, password, name, phone} = await req.json()
     if (!username || !password)
         return NextResponse.json("Invalid username or password")
     const unique = await prisma.uSER.findFirst({
@@ -17,18 +17,38 @@ export async function POST(req){
 
     try {
         const hash = await bcrypt.hash(password, Number(process.env.saltRound))
-    
-        const user = await prisma.uSER.create({
+
+        const [user, customer] = await prisma.$transaction([
+            prisma.uSER.create({
+                data: {
+                    username: username,
+                    password: hash
+                }
+            }),
+            prisma.cUSTOMER.create({
+                data: {
+                    name: name,
+                    phone: phone,
+                }
+            })
+        ])
+        
+        await prisma.cUSTOMER.update({
             data: {
-                username: username,
-                password: hash
+                USER: {
+                    connect: {
+                        user_id: user.user_id
+                    }
+                }
+            },
+            where: {
+                customer_id: customer.customer_id
             }
         })
 
         return NextResponse.json({
-            message: true
+            ...customer
         }, { status: 200 })
-        
     }catch (e){
         console.log(e);
         return NextResponse.json(e, {status: 400})
