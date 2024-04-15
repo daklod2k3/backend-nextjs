@@ -7,7 +7,13 @@ export async function POST(req){
     const headerList = headers()
     const token = headerList.get('authorization')
     // console.log(token);
+    if (validToken(token))
+        return NextResponse.json({},{
+            status: 200
+        })
     return NextResponse.json({
-        mess: validToken(token)
+        // "message": 
+    }, {
+        status: 400
     })
 }
