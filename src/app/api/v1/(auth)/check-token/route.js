@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { validToken } from '../_components/useToken';
+import { validToken } from '../_components/authToken';
 
 
 export async function POST(req){

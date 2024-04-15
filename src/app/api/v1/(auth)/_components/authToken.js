@@ -3,7 +3,7 @@ import { prisma } from '../../helper';
 
 const key = String(process.env.JWT_SECRET_KEY)
 
-export const useToken = (user_id)=>{
+export const getToken = (user_id)=>{
     const expire = null
     // console.log(key);
     if (!user_id)

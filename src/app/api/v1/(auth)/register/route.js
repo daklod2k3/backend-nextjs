@@ -1,6 +1,7 @@
 import { prisma } from '@/app/api/v1/helper.js';
 import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
+import { getToken } from '../_components/authToken';
 
 export async function POST(req){
     const {username, password, name, phone} = await req.json()
@@ -48,7 +49,12 @@ export async function POST(req){
 
         return NextResponse.json({
             ...customer
-        }, { status: 200 })
+        }, { 
+            status: 200,
+            headers: {
+                Authorization: getToken(user.user_id)
+            }
+        })
     }catch (e){
         console.log(e);
         return NextResponse.json(e, {status: 400})
