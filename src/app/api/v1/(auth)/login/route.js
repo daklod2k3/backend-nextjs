@@ -1,6 +1,7 @@
 import { prisma } from '@/app/api/v1/helper.js';
 import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
+import { useToken } from '../_components/useToken';
 
 export async function POST(req){
 
@@ -23,6 +24,9 @@ export async function POST(req){
         return NextResponse.json({
             message: true,
         }, {
+            headers:{
+                Authorization: useToken(user.user_id)
+            },
             status: 200
         })
     }
