@@ -14,6 +14,6 @@ Techstack:
  - Prisma for DB ORM
  - Nextjs for routing request
  - Authentication with JWT
- - 
+ - bcrypt for encrypt password
 
 For testing with postman: https://www.postman.com/winter-flare-974089/workspace/api-backend/overview
