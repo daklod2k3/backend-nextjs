@@ -6,7 +6,7 @@ import { validToken } from '../_components/authToken';
 export async function POST(req){
     const headerList = headers()
     const token = headerList.get('authorization')
-    // console.log(token);
+    console.log(token);
     if (validToken(token))
         return NextResponse.json({},{
             status: 200
@@ -14,6 +14,6 @@ export async function POST(req){
     return NextResponse.json({
         // "message": 
     }, {
-        status: 400
+        status: 401
     })
 }

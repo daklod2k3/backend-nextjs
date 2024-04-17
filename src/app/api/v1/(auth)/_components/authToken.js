@@ -19,15 +19,17 @@ export const getToken = (user_id)=>{
 export const validToken = (token)=>{
     try {
         const verified = jwt.verify(token, key)
+        console.log(verified);
         if (!verified) return false
         const user = prisma.uSER.findFirst({
             where: {
                 user_id: verified.user_id
             }
         })
-        return user == null
+        return user !== null
     }catch (e){
-        return e.message
+        console.log(e.message);
+        return false
     }
 
 }
