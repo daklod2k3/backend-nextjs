@@ -65,6 +65,7 @@ model INVOICE_DETAIL {
   user_id    Int
   INVOICE    INVOICE @relation(fields: [invoice_id], references: [invoice_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_INVOICE")
   PRODUCT    PRODUCT @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_PRODUCT")
+  USER       USER    @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_USER")
 
   @@id([product_id, user_id], map: "PK_INVOICE_DETAIL")
 }
@@ -107,15 +108,16 @@ model ROLE_FUNCTION {
 }
 
 model USER {
-  user_id      Int        @id(map: "PK_taikhoan") @default(autoincrement())
-  username     String     @db.NVarChar(50)
-  password     String     @db.NVarChar(Max)
-  date_created DateTime?  @default(now(), map: "DEFAULT_USER_date_created") @db.Date
-  status       Boolean    @default(true, map: "DEFAULT_USER_status")
-  role_id      Int?
-  CUSTOMER     CUSTOMER[]
-  EMPLOYEE     EMPLOYEE[]
-  ROLE         ROLE?      @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_USER_ROLE")
+  user_id        Int              @id(map: "PK_taikhoan") @default(autoincrement())
+  username       String           @db.NVarChar(50)
+  password       String           @db.NVarChar(Max)
+  date_created   DateTime?        @default(now(), map: "DEFAULT_USER_date_created") @db.Date
+  status         Boolean          @default(true, map: "DEFAULT_USER_status")
+  role_id        Int?
+  CUSTOMER       CUSTOMER[]
+  EMPLOYEE       EMPLOYEE[]
+  INVOICE_DETAIL INVOICE_DETAIL[]
+  ROLE           ROLE?            @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_USER_ROLE")
 }
 
 model VENDOR {

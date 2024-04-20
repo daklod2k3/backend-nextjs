@@ -13,6 +13,7 @@ export async function GET(req){
                                     const param = QueryConvert(item)
                                     console.log(param.key);
                                     switch (param.key){
+                                        case "product_id":
                                         case "amount":
                                         case "category_id":
                                         case "price":
@@ -33,10 +34,6 @@ export async function GET(req){
                                     }
                                 }, {})
     console.log(filter);
-
-    const finalFilter = {
-        // vendor_id: filter.vendor_id
-    }
 
     try {
         const categories = await prisma.pRODUCT.findMany({

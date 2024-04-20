@@ -1,7 +1,7 @@
 import { prisma } from '@/app/api/v1/helper.js';
 import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
-import { getToken } from '../_components/authToken';
+import { getToken } from '../_component/authToken';
 
 export async function POST(req){
 
