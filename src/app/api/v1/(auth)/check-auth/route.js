@@ -1,6 +1,6 @@
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
-import { validToken } from '../_component/authToken';
+import { validToken } from '../_lib/authToken';
 
 
 export async function GET(req){
