@@ -14,14 +14,13 @@ model CATEGORY {
 }
 
 model CUSTOMER {
-  customer_id Int       @id(map: "PK_CUSTOMER") @default(autoincrement())
-  name        String?   @db.NVarChar(50)
-  address     String?   @db.NVarChar(50)
-  phone       String?   @db.NVarChar(15)
-  personal_id String?   @db.NVarChar(50)
+  customer_id Int     @id(map: "PK_CUSTOMER") @default(autoincrement())
+  name        String? @db.NVarChar(50)
+  address     String? @db.NVarChar(50)
+  phone       String? @db.NVarChar(15)
+  personal_id String? @db.NVarChar(50)
   user_id     Int?
-  USER        USER?     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_CUSTOMER_USER")
-  INVOICE     INVOICE[]
+  USER        USER?   @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_CUSTOMER_USER")
 }
 
 model EMPLOYEE {
@@ -46,26 +45,27 @@ model FUNCTION {
 
 model INVOICE {
   invoice_id     Int              @id(map: "PK_INVOICE") @default(autoincrement())
-  customer_id    Int?
   employee_id    Int?
+  user_id        Int?
   status_id      Int
   date_created   DateTime?        @default(now(), map: "DEFAULT_INVOICE_date_created") @db.Date
-  CUSTOMER       CUSTOMER?        @relation(fields: [customer_id], references: [customer_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_INVOICE_CUSTOMER")
   EMPLOYEE       EMPLOYEE?        @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_INVOICE_EMPLOYEE_1")
   INVOICE_STATUS INVOICE_STATUS   @relation(fields: [status_id], references: [invoice_status_id], onUpdate: NoAction, map: "FK_INVOICE_INVOICE_STATUS")
+  USER           USER?            @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_INVOICE_USER")
   INVOICE_DETAIL INVOICE_DETAIL[]
 }
 
 model INVOICE_DETAIL {
-  invoice_id Int
+  id         Int      @default(autoincrement())
+  invoice_id Int?
   product_id Int
   amount     Int
-  total      Float
-  tax        Float
+  total      Float?
+  tax        Float?
   user_id    Int
-  INVOICE    INVOICE @relation(fields: [invoice_id], references: [invoice_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_INVOICE")
-  PRODUCT    PRODUCT @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_PRODUCT")
-  USER       USER    @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_USER")
+  INVOICE    INVOICE? @relation(fields: [invoice_id], references: [invoice_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_INVOICE_DETAIL_INVOICE")
+  PRODUCT    PRODUCT  @relation(fields: [product_id], references: [product_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_PRODUCT")
+  USER       USER     @relation(fields: [user_id], references: [user_id], onUpdate: NoAction, map: "FK_INVOICE_DETAIL_USER")
 
   @@id([product_id, user_id], map: "PK_INVOICE_DETAIL")
 }
@@ -84,6 +84,7 @@ model PRODUCT {
   img_url        String?          @db.NVarChar(Max)
   amount         Int              @default(0, map: "DEFAULT_PRODUCT_amount")
   category_id    Int?
+  description    String?          @db.NVarChar(Max)
   INVOICE_DETAIL INVOICE_DETAIL[]
   CATEGORY       CATEGORY?        @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_PRODUCT_CATEGORY")
   VENDOR         VENDOR?          @relation(fields: [vendor_id], references: [vendor_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_PRODUCT_VENDOR")
@@ -116,6 +117,7 @@ model USER {
   role_id        Int?
   CUSTOMER       CUSTOMER[]
   EMPLOYEE       EMPLOYEE[]
+  INVOICE        INVOICE[]
   INVOICE_DETAIL INVOICE_DETAIL[]
   ROLE           ROLE?            @relation(fields: [role_id], references: [role_id], onDelete: NoAction, onUpdate: NoAction, map: "FK_USER_ROLE")
 }

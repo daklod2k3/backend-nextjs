@@ -1,7 +1,7 @@
 import { prisma } from '@/app/api/v1/helper.js';
 import bcrypt from 'bcrypt';
 import { NextResponse } from 'next/server';
-import { getToken } from '../_component/authToken';
+import { getToken } from '../_lib/authToken';
 
 export async function POST(req){
     const {username, password, name, phone} = await req.json()
@@ -23,7 +23,12 @@ export async function POST(req){
             prisma.uSER.create({
                 data: {
                     username: username,
-                    password: hash
+                    password: hash,
+                    ROLE: {
+                        connect: {
+                            role_id: 3
+                        }
+                    }
                 }
             }),
             prisma.cUSTOMER.create({
@@ -34,7 +39,7 @@ export async function POST(req){
             })
         ])
         
-        await prisma.cUSTOMER.update({
+        const result = await prisma.cUSTOMER.update({
             data: {
                 USER: {
                     connect: {
@@ -46,13 +51,13 @@ export async function POST(req){
                 customer_id: customer.customer_id
             }
         })
-
+    
         return NextResponse.json({
-            ...customer
+            ...result
         }, { 
             status: 200,
             headers: {
-                Authorization: getToken(user.user_id)
+                Authorization: getToken(result)
             }
         })
     }catch (e){

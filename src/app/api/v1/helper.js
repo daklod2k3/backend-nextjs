@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 
-export const prisma = new PrismaClient()
 
 const op_map_prisma = {
     "eq" : "equals",
@@ -32,3 +31,12 @@ export const QueryToPrismaSearch = (value)=>{
         }
     }
 }
+
+
+const prismaClientSingleton = () => {
+  return new PrismaClient()
+}
+
+export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+
+if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma

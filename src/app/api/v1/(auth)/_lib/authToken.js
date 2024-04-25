@@ -1,36 +1,51 @@
 import jwt from 'jsonwebtoken';
 import { headers } from 'next/headers';
+import { NextResponse } from 'next/server';
 import { prisma } from '../../helper';
 
 const key = String(process.env.JWT_SECRET_KEY)
 
-export const getToken = (user_id)=>{
+export const getToken = (info)=>{
     const expire = null
     // console.log(key);
-    if (!user_id)
+    if (!info)
         return null
     const token = jwt.sign({
-        user_id: user_id,
+        ...info,
         ...expire,
         time: Date()
     }, key)
     return token
 }
 
-export const validToken = async (token)=>{
+export const validToken = async ()=>{
+
+    const headerList = headers()
+    const token = headerList.get('authorization')
+
+    console.log(token);
+
     try {
         const verified = jwt.verify(token, key)
-        console.log(verified);
+        // console.log(verified);
         if (!verified) return false
         const user = await prisma.uSER.findFirst({
             where: {
                 user_id: verified.user_id
             }
         })
-        return user ?? false
+        return verified ?? false
     }catch (e){
         console.log(e.message);
         return false
     }
 
+}
+
+export const unauthorizeResponse = ()=>{
+    return NextResponse.json({
+        message: "Unauthorize"
+    }, {
+        status: 401
+    })
 }
