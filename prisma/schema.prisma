@@ -7,6 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model BANNER {
+  bannder_id Int    @id(map: "PK_NewTable") @default(autoincrement())
+  image_url  String @db.NVarChar(Max)
+  open_url   String @db.NVarChar(Max)
+}
+
 model CATEGORY {
   category_id Int       @id(map: "PK_CATEGORY") @default(autoincrement())
   name        String?   @db.NVarChar(Max)

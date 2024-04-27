@@ -37,6 +37,7 @@ const prismaClientSingleton = () => {
   return new PrismaClient()
 }
 
-export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+// export const prisma = globalThis.prismaGlobal ?? prismaClientSingleton()
+export const prisma = new PrismaClient()
 
 if (process.env.NODE_ENV !== 'production') globalThis.prismaGlobal = prisma
