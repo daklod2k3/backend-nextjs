@@ -1,6 +1,7 @@
 import { validToken } from '@/app/api/v1/(auth)/_lib/authToken.js';
 import { headers } from 'next/headers';
 import { NextResponse } from 'next/server';
+import { unauthorizeResponse } from './app/api/v1/(auth)/_lib/authToken';
 
 export async function middleware(request) {
   const headerList = headers()
@@ -19,10 +20,7 @@ export async function middleware(request) {
     request.nextUrl.pathname === '/'
   ) {
     if (!token) {
-      return NextResponse.json({
-      },{
-        status: 401
-      })
+      return unauthorizeResponse()
       
     }
   }
