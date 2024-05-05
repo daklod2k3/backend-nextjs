@@ -127,7 +127,8 @@ export async function POST(req){
         
             const product_in_cart = await tx.iNVOICE_DETAIL.findFirst({
                 where: {
-                    product_id: product.product_id
+                    product_id: product.product_id,
+                    user_id: user.user_id
                 }
             })
         
