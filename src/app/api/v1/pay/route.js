@@ -40,7 +40,8 @@ export async function GET (req){
             }
         })
 
-        if (product.amount < cart.amount)
+        // if (product.amount < cart.amount)
+
 
 
 
