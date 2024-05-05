@@ -1,3 +1,4 @@
+import { NextResponse } from "next/server";
 import { unauthorizeResponse, validToken } from "../(auth)/_lib/authToken";
 
 export async function GET (){
@@ -6,6 +7,6 @@ export async function GET (){
         return unauthorizeResponse()
 
     
-    
+    return NextResponse.json({})
     
 }
