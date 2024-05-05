@@ -19,6 +19,12 @@ function productAmountError(){
     })
 }
 
+async function payCart(){
+    return await prisma.$transaction(async (tx)=>{
+
+    })
+}
+
 export async function GET (req){
     const user = validToken()
     if (!user) 
@@ -30,6 +36,7 @@ export async function GET (req){
         return invalidCart()
     }
 
+
     for (const cart in Array.from(carts)){
         if (!cart.product_id || !cart.amount)
             return invalidCart()
@@ -40,7 +47,12 @@ export async function GET (req){
             }
         })
 
-        // if (product.amount < cart.amount)
+        if (product.amount < cart.amount)
+            return productAmountError()
+
+
+
+
 
 
 

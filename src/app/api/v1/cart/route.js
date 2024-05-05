@@ -1,7 +1,4 @@
-// import { NextResponse } from "next/server";
-import { connect } from "http2";
-import { headers } from "next/headers";
-import { notFound } from "next/navigation";
+
 import { NextResponse } from "next/server";
 import { unauthorizeResponse, validToken } from "../(auth)/_lib/authToken";
 import { prisma } from "../helper";
@@ -59,8 +56,20 @@ export async function GET(req){
         }
     })
     
+    const product_list = []
+    for (let i = 0; i < carts.length; i++){
+        const product = await prisma.pRODUCT.findFirst({
+            where: {
+                product_id: carts[i].product_id
+            }
+        })
+        product_list.push(product)
+    }
 
-    return NextResponse.json(carts)
+    return NextResponse.json({
+        productList: product_list,
+        invoiceDetail: carts
+    })
 
     
     
