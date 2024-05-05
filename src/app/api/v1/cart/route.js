@@ -80,9 +80,8 @@ export async function POST(req){
         }
     })
 
-    
     const item = await req.json()
-    if (item.product_id){
+    if (!item.product_id){
         return NextResponse.json({
             message: "Missing product_id"
         },{
@@ -90,7 +89,7 @@ export async function POST(req){
         })
     }
 
-    if (item.amount){
+    if (!item.amount){
         return NextResponse.json({
             message: "Missing amount"
         },{
