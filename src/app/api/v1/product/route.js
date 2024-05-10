@@ -35,11 +35,20 @@ export async function GET(req){
                                 }, {})
     console.log(filter);
 
+    const page = Number(searchParams.get('page') ?? 1) < 1 ? 1 : Number(searchParams.get('page') ?? 1)
+    const item_in_page = Number(searchParams.get('item_in_page') ?? 20) < 1 ? 20 : Number(searchParams.get('item_in_page') ?? 20)
+
+    console.log(page);
+    console.log(item_in_page);
+
+
     try {
         const categories = await prisma.pRODUCT.findMany({
             where: {
                 ...filter
-            }
+            },
+            take: item_in_page,
+            skip: item_in_page * (page - 1)
         })
         return NextResponse.json(categories)
     } catch (e) {
