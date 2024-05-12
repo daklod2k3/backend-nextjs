@@ -34,7 +34,7 @@ export const validToken = async ()=>{
                 user_id: verified.user_id
             }
         })
-        return verified ?? false
+        return user ?? false
     }catch (e){
         console.log(e.message);
         return false

@@ -98,6 +98,9 @@ export async function POST(req){
         }
     })
 
+    // if (!user)
+    //     return NextResponse.json
+
     const item = await req.json()
     if (!item.product_id){
         return NextResponse.json({
@@ -114,9 +117,7 @@ export async function POST(req){
             status: 400
         })
     }
-
-    const transaction = async (item)=>{
-        return prisma.$transaction(async (tx)=>{
+    try{
             const {
                 product_id,
                 // amount,
@@ -127,7 +128,7 @@ export async function POST(req){
             console.log(item);
         
         
-            const product = await tx.pRODUCT.findFirst({
+            const product = await prisma.pRODUCT.findFirst({
                 where: {
                     product_id: Number(product_id)
                 }
@@ -140,15 +141,15 @@ export async function POST(req){
                     status: 400
                 })
         
-            let cart = await tx.iNVOICE.findFirst({
+            let cart = await prisma.iNVOICE.findFirst({
                 where: {
-                    user_id: user.user_id,
+                    user_id: Number(user.user_id),
                     status_id: 4
                 },
             })
 
             if (!cart){
-                cart = await tx.iNVOICE.create({
+                cart = await prisma.iNVOICE.create({
                     data: {
                         USER: {
                             connect: {
@@ -166,7 +167,7 @@ export async function POST(req){
 
                 
         
-            const product_in_cart = await tx.iNVOICE_DETAIL.findFirst({
+            const product_in_cart = await prisma.iNVOICE_DETAIL.findFirst({
                 where: {
                     product_id: product.product_id,
                     user_id: user.user_id,
@@ -187,7 +188,7 @@ export async function POST(req){
                 })
 
             if (amount + amount_in_cart == 0){
-                const result = await tx.iNVOICE_DETAIL.delete({
+                const result = await prisma.iNVOICE_DETAIL.delete({
                     where: {
                         product_id_user_id_invoice_id :{
                             product_id: product_in_cart.product_id,
@@ -217,7 +218,7 @@ export async function POST(req){
                 })
             
             if (product_in_cart){
-                const rs = await tx.iNVOICE_DETAIL.update({
+                const rs = await prisma.iNVOICE_DETAIL.update({
                     where: {
                         product_id_user_id_invoice_id: {
                             product_id: product.product_id,
@@ -236,7 +237,7 @@ export async function POST(req){
                     })
 
             }else {
-                const rs = await tx.iNVOICE_DETAIL.create({
+                const rs = await prisma.iNVOICE_DETAIL.create({
                     data: {
                         INVOICE: {
                             connect: {
@@ -272,14 +273,14 @@ export async function POST(req){
             return NextResponse.json({},{
                 status: 200
             })
-            
+
+    }catch (e){
+        return NextResponse.json({
+            message: e.message
+        },{
+            status: 400
         })
+
     }
-
-    return transaction(item)
-
-    
-    
-
     
 }
