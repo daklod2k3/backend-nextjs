@@ -185,30 +185,37 @@ export async function POST(req){
                 }, {
                     status: 400
                 })
-            
-            // const cart = await tx.iNVOICE_DETAIL.upsert({
-            //     where: {
-            //         product_id: product.product_id,
-            //         user_id: Number(user.user_id)
-            //     },
-            //     update: {
-            //         amount: amount + amount_in_cart
-            //     },
-            //     create: {
-            //         PRODUCT: {
-            //             connect: {
-            //                 product_id: product.product_id
-            //             }
-            //         },
-            //         USER: {
-            //             connect: {
-            //                 user_id: Number(user.user_id)
-            //             }
-            //         },
-            //         amount: amount + amount_in_cart
-            //     }
-            // })
 
+            if (amount + amount_in_cart == 0){
+                const result = await tx.iNVOICE_DETAIL.delete({
+                    where: {
+                        product_id_user_id_invoice_id :{
+                            product_id: product_in_cart.product_id,
+                            user_id: user.user_id,
+                            invoice_id: cart.invoice_id                            
+                        }
+                    }
+                })
+
+                if (result)
+                    return NextResponse.json({},{
+                        status: 200
+                    })
+
+                return NextResponse.json({
+                    message: "Can't delete product"
+                },{
+                    status: 400
+                })
+            }
+            
+            if (amount + amount_in_cart < 0)
+                return NextResponse.json({
+                    message: "Amount can't positive number"
+                }, {
+                    status: 400
+                })
+            
             if (product_in_cart){
                 const rs = await tx.iNVOICE_DETAIL.update({
                     where: {
