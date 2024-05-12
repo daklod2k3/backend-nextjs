@@ -20,8 +20,8 @@ function productAmountError(){
 }
 
 async function payCart(carts, user){
-    return await prisma.$transaction(async (tx)=>{
-        const invoice = await tx.iNVOICE.create({
+    try{
+        const invoice = await prisma.iNVOICE.create({
             data:{
                 USER: {
                     connect:{
@@ -30,14 +30,21 @@ async function payCart(carts, user){
                 }, 
                 INVOICE_STATUS: {
                     connect: {
-                        invoice_status_id: 0
+                        invoice_status_id: 1
                     }
                 }
             }
         })
 
-        for (const cart in Array.from(carts)){
-            
+        await prisma.iNVOICE_DETAIL.deleteMany({
+            where: {
+                invoice_id: null,
+                user_id: user.user_id
+            }
+        })
+
+        Array.from(carts).forEach(async (cart)=>{
+            console.log(cart);
             try {
                 Number(cart.product_id)
                 Number(cart.amount)
@@ -49,42 +56,66 @@ async function payCart(carts, user){
                 })
             }
 
-            if (!cart.product_id || !cart.amount)
-                return invalidCart()
     
-            const product = await tx.pRODUCT.findFirst({
+            const product = await prisma.pRODUCT.findFirst({
                 where: {
-                    product_id: cart.product_id
+                    product_id: Number(cart.product_id)
                 }
             })
     
             if (product.amount < cart.amount)
                 return productAmountError()
             
-            await tx.iNVOICE_DETAIL.update({
-                where: {
-                    product_id_user_id:{
-                        user_id: user.user_id,
-                        product_id: product.product_id
+            await prisma.iNVOICE_DETAIL.create({
+                data: {
+                    USER: {
+                        connect: {
+                            user_id: user.user_id
+                        }
                     },
-                    invoice_id: invoice.invoice_id
+                    INVOICE: {
+                        connect: {
+                            invoice_id: invoice.invoice_id
+                        }
+                    },
+                    PRODUCT: {
+                        connect: {
+                            product_id: product.product_id
+                        }
+                    },
+                    amount: Number(cart.amount),
                 }
             })
 
-        }
-
+            await prisma.pRODUCT.update({
+                where: {
+                    product_id: Number(cart.product_id)
+                },
+                data: {
+                    amount: product.amount - Number(cart.amount)
+                }
+            })
+        })
+            
         return NextResponse.json({}, {
             status: 200
         })
-    })
+    }
+    catch {
+        return NextResponse.json({},{
+            status: 400
+        })
+    }
+    
 }
 
-export async function GET (req){
-    const user = validToken()
+export async function POST (req){
+    const user = await validToken()
     if (!user) 
         return unauthorizeResponse()
 
-    const {carts} = req.json()
+    const carts = await req.json()
+    console.log(carts);
 
     if (!carts || Array.from(carts).length < 1){
         return invalidCart()
@@ -99,6 +130,7 @@ export async function GET (req){
     // return NextResponse.json({},{
     //     status: 400
     // })
-    return payCart(carts, user)
+    return await payCart(carts, user)
+
     
 }
