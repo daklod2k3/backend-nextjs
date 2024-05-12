@@ -36,13 +36,6 @@ async function payCart(carts, user){
             }
         })
 
-        await prisma.iNVOICE_DETAIL.deleteMany({
-            where: {
-                invoice_id: null,
-                user_id: user.user_id
-            }
-        })
-
         Array.from(carts).forEach(async (cart)=>{
             console.log(cart);
             try {
@@ -109,28 +102,61 @@ async function payCart(carts, user){
     
 }
 
-export async function POST (req){
+export async function GET (req){
     const user = await validToken()
     if (!user) 
         return unauthorizeResponse()
 
-    const carts = await req.json()
-    console.log(carts);
+    // const carts = await req.json()
+    // console.log(carts);
 
-    if (!carts || Array.from(carts).length < 1){
-        return invalidCart()
+    // if (!carts || Array.from(carts).length < 1){
+    //     return invalidCart()
+    // }
+    try {
+        const result = await prisma.$transaction(async (tx)=>{
+            const invoice = await tx.iNVOICE.create({
+                data:{
+                    USER: {
+                        connect:{
+                            user_id: Number(user.user_id)
+                        }
+                    },
+                    INVOICE_STATUS: {
+                        connect: {
+                            status_id: 1
+                        }
+                    }
+                }
+            })
+            const detail = await tx.iNVOICE_DETAIL.updateMany({
+                where: {
+                    invoice_id: null,
+                    user_id: Number(user.user_id)
+                },
+                data: {
+                    invoice_id: invoice.invoice_id
+                }
+            })
+
+            if (detail.count < 1){
+                throw new Error("Not thing in cart")
+            }
+
+        })
+
+        return NextResponse.json({},{
+            status: 200
+        })
+
+    }catch (e){
+        return NextResponse.json({
+            message: e.message
+        }, {
+            status: 400
+        })
     }
 
-    // if (payCart(carts, user)){
-    //     return NextResponse.json({}, {
-    //         status: 200
-    //     })
-    // }
-    
-    // return NextResponse.json({},{
-    //     status: 400
-    // })
-    return await payCart(carts, user)
 
     
 }

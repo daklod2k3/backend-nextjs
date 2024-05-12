@@ -131,13 +131,24 @@ export async function POST(req){
                     status: 400
                 })
         
-            
+            const cart = await tx.iNVOICE.upsert({
+                where: {
+                    user_id: user.user_id,
+                    status_id: 4
+                },
+                create: {
+                    user_id: user.user_id,
+                    status_id: 4
+                }
+            })
+
                 
         
             const product_in_cart = await tx.iNVOICE_DETAIL.findFirst({
                 where: {
                     product_id: product.product_id,
-                    user_id: user.user_id
+                    user_id: user.user_id,
+                    invoice_id: cart.invoice_id
                 }
             })
         

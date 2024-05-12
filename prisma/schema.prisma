@@ -74,7 +74,7 @@ model INVOICE {
 
 model INVOICE_DETAIL {
   id                 Int      @default(autoincrement())
-  invoice_id         Int?
+  invoice_id         Int
   product_id Int
   amount             Int
   total              Float?
@@ -84,7 +84,7 @@ model INVOICE_DETAIL {
   PRODUCT            PRODUCT  @relation(fields: [product_id], references: [product_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invoice_detail_product")
   USER               USER     @relation(fields: [user_id], references: [user_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invoice_detail_user")
 
-  @@id([product_id, user_id])
+  @@id([product_id, user_id, invoice_id])
   @@index([invoice_id], map: "fk_invoice_detail_invoice")
   @@index([user_id], map: "fk_invoice_detail_user")
   @@index([id], map: "ix_autoincrement_INVOICE_DETAIL")
