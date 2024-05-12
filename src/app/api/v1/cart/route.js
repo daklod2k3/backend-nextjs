@@ -49,12 +49,21 @@ export async function GET(req){
         return unauthorizeResponse()
     }
 
-    const carts = await prisma.iNVOICE_DETAIL.findMany({
+    const invoice = await prisma.iNVOICE.findFirst({
         where: {
-            invoice_id: null,
+            status_id: 4,
             user_id: verified.user_id
         }
     })
+
+    let carts = []
+    if (invoice)
+        carts = await prisma.iNVOICE_DETAIL.findMany({
+            where: {
+                invoice_id: invoice.invoice_id,
+                user_id: verified.user_id
+            }
+        })
     
     const product_list = []
     for (let i = 0; i < carts.length; i++){
@@ -131,16 +140,29 @@ export async function POST(req){
                     status: 400
                 })
         
-            const cart = await tx.iNVOICE.upsert({
+            let cart = await tx.iNVOICE.findFirst({
                 where: {
                     user_id: user.user_id,
                     status_id: 4
                 },
-                create: {
-                    user_id: user.user_id,
-                    status_id: 4
-                }
             })
+
+            if (!cart){
+                cart = await tx.iNVOICE.create({
+                    data: {
+                        USER: {
+                            connect: {
+                                user_id: user.user_id
+                            }
+                        },
+                        INVOICE_STATUS: {
+                            connect: {
+                                status_id: 4
+                            }
+                        }
+                    }
+                })
+            }
 
                 
         
@@ -190,9 +212,10 @@ export async function POST(req){
             if (product_in_cart){
                 const rs = await tx.iNVOICE_DETAIL.update({
                     where: {
-                        product_id_user_id: {
+                        product_id_user_id_invoice_id: {
                             product_id: product.product_id,
-                            user_id: user.user_id
+                            user_id: user.user_id,
+                            invoice_id: cart.invoice_id
                         }
                     },
                     data: {
@@ -208,6 +231,11 @@ export async function POST(req){
             }else {
                 const rs = await tx.iNVOICE_DETAIL.create({
                     data: {
+                        INVOICE: {
+                            connect: {
+                                invoice_id: cart.invoice_id
+                            }
+                        },
                         PRODUCT: {
                             connect: {
                                 product_id: product.product_id,

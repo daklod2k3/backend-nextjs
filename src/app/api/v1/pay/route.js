@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { unauthorizeResponse, validToken } from "../(auth)/_lib/authToken";
-import { prisma } from "../helper";
+import { prisma, QueryConvert } from "../helper";
 
 
 function invalidCart(){
@@ -102,7 +102,7 @@ async function payCart(carts, user){
     
 }
 
-export async function GET (req){
+export async function POST (req){
     const user = await validToken()
     if (!user) 
         return unauthorizeResponse()
@@ -114,37 +114,50 @@ export async function GET (req){
     //     return invalidCart()
     // }
     try {
-        const result = await prisma.$transaction(async (tx)=>{
-            const invoice = await tx.iNVOICE.create({
-                data:{
-                    USER: {
-                        connect:{
-                            user_id: Number(user.user_id)
-                        }
-                    },
-                    INVOICE_STATUS: {
-                        connect: {
-                            status_id: 1
-                        }
-                    }
-                }
-            })
-            const detail = await tx.iNVOICE_DETAIL.updateMany({
-                where: {
-                    invoice_id: null,
-                    user_id: Number(user.user_id)
-                },
-                data: {
-                    invoice_id: invoice.invoice_id
-                }
-            })
-
-            if (detail.count < 1){
-                throw new Error("Not thing in cart")
+        const invoice = await prisma.iNVOICE.findFirst({
+            where: {
+                user_id: user.user_id,
+                status_id: 4
             }
-
         })
 
+        if (!invoice)
+            throw new Error("Nothing in cart")
+
+        const details = await prisma.iNVOICE_DETAIL.findMany({
+            where: {
+                invoice_id: invoice.invoice_id
+            }
+        })
+
+        details.forEach(async (detail)=>{
+            const product = await prisma.pRODUCT.findFirst({
+                where: {
+                    product_id: detail.product_id
+                }
+            })
+            if (product.amount < detail.amount)
+                throw new Error("Amount not enough")
+            const update = await prisma.pRODUCT.update({
+                where:{
+                    product_id: product.product_id,
+                },
+                data: {
+                    amount: product.amount - detail.amount
+                }
+            })
+        })
+
+        await prisma.iNVOICE.update({
+            where: {
+                user_id: user.user_id,
+                invoice_id: invoice.invoice_id
+            },
+            data:{
+                status_id: 1
+            }
+        })
+        
         return NextResponse.json({},{
             status: 200
         })
@@ -156,7 +169,34 @@ export async function GET (req){
             status: 400
         })
     }
-
-
     
+}
+
+export async function GET (req){
+    const url = new URL(await req.url)
+    const {searchParams} = url
+
+    const filter = searchParams.getAll("filter")
+                                .map(item=>{
+                                    const param = QueryConvert(item)
+                                    console.log(param.key);
+                                    switch (param.key){
+                                        case "invoice_id":
+                                        case "employee_id":
+                                        case "user_id":
+                                        case "status_id":
+                                            param.value = Number(param.value)
+                                            return param                                            
+
+                                    }
+                                    return null
+                                })
+                                .reduce((rec, item)=> {
+                                    if (!item) return rec
+                                    return {
+                                        ...rec,
+                                        ...QueryToPrismaSearch(item)
+                                    }
+                                }, {})
+    console.log(filter);
 }
