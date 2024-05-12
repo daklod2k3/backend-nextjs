@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { unauthorizeResponse, validToken } from "../(auth)/_lib/authToken";
-import { prisma, QueryConvert } from "../helper";
+import { prisma, QueryConvert, QueryToPrismaSearch } from "../helper";
 
 
 function invalidCart(){
@@ -154,7 +154,8 @@ export async function POST (req){
                 invoice_id: invoice.invoice_id
             },
             data:{
-                status_id: 1
+                status_id: 1,
+                date_created: new Date()
             }
         })
         
@@ -175,6 +176,8 @@ export async function POST (req){
 export async function GET (req){
     const url = new URL(await req.url)
     const {searchParams} = url
+
+    const user = validToken()
 
     const filter = searchParams.getAll("filter")
                                 .map(item=>{
@@ -199,4 +202,14 @@ export async function GET (req){
                                     }
                                 }, {})
     console.log(filter);
+
+    const invoice = await prisma.iNVOICE.findMany({
+        where: {
+            user_id: user.user_id,
+            ...filter
+        }
+    })
+
+    return NextResponse.json(invoice)
+
 }
