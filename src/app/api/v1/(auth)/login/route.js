@@ -16,7 +16,9 @@ export async function POST(req){
     if (!account){
         return NextResponse.json({
             message: "Username or password invalid!"
-        }).status(400)
+        }, {
+            status: 400
+        })
     }
     
     
@@ -24,7 +26,7 @@ export async function POST(req){
 
     if (!await bcrypt.compare(password, account.password)){
         return NextResponse.json({
-            message: 'Username or password invalid!'
+            message: 'Username or password incorrect!'
         }, {
             status: 400
         })
@@ -33,6 +35,8 @@ export async function POST(req){
         // console.log(user);
     let user = null;
     switch (account.role_id){
+        case 1:
+            user = account
         case 2:
             user = await prisma.eMPLOYEE.findFirst({
                 where: {
