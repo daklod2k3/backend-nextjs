@@ -222,6 +222,9 @@ export async function GET (req){
                                 }, {})
     console.log(filter);
 
+    if (filter.invoice_id)
+        return getById(req, filter.invoice_id)
+
     const invoices = await prisma.iNVOICE.findMany({
         where: {
             user_id: user.user_id,
@@ -249,4 +252,62 @@ export async function GET (req){
 
     return NextResponse.json(invoices)
 
+}
+
+
+async function getById(req, invoice_id){
+    
+    // const user_id = await getUser(req)
+    // if (user_id instanceof NextResponse)
+    //     return user_id
+
+    // const cart = await prisma.iNVOICE_DETAIL.findFirst({
+    //     where:{
+    //         user_id: user_id
+    //     }
+    // })
+    
+    // return NextResponse.json({
+    //     ...cart
+    // })
+    
+    const verified = await validToken()
+
+    if (!verified){
+        return unauthorizeResponse()
+    }
+
+    const invoice = await prisma.iNVOICE.findFirst({
+        where: {
+            invoice_id: invoice_id
+        }
+    })
+
+    let carts = []
+    if (invoice)
+        carts = await prisma.iNVOICE_DETAIL.findMany({
+            where: {
+                invoice_id: invoice.invoice_id,
+                user_id: verified.user_id
+            }
+        })
+    
+    const product_list = []
+    for (let i = 0; i < carts.length; i++){
+        const product = await prisma.pRODUCT.findFirst({
+            where: {
+                product_id: carts[i].product_id
+            }
+        })
+        product_list.push(product)
+    }
+
+    return NextResponse.json({
+        productList: product_list,
+        invoiceDetail: carts,
+        invoice: invoice
+    })
+
+    
+    
 }
