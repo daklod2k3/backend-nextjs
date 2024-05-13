@@ -61,6 +61,8 @@ model INVOICE {
   employee_id    Int?
   user_id        Int?
   status_id      Int
+  total_product  Int?
+  total_amount   Int?
   date_created   DateTime?        @db.Date
   employee       EMPLOYEE?        @relation(fields: [employee_id], references: [employee_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invoice_employee_1")
   INVOICE_STATUS INVOICE_STATUS   @relation(fields: [status_id], references: [status_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_invoice_invoice_status")

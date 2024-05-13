@@ -35,9 +35,9 @@ async function payCart(carts, user){
                 }
             }
         })
-
+        
         Array.from(carts).forEach(async (cart)=>{
-            console.log(cart);
+            // console.log(cart);
             try {
                 Number(cart.product_id)
                 Number(cart.amount)
@@ -79,7 +79,7 @@ async function payCart(carts, user){
                     amount: Number(cart.amount),
                 }
             })
-
+            
             await prisma.pRODUCT.update({
                 where: {
                     product_id: Number(cart.product_id)
@@ -88,8 +88,19 @@ async function payCart(carts, user){
                     amount: product.amount - Number(cart.amount)
                 }
             })
-        })
             
+        })
+        
+        await prisma.iNVOICE.update({
+            where: {
+                invoice_id: invoice.invoice_id
+            },
+            data: {
+                total_amount: total_amount,
+                total_product: total_product
+            }
+        })
+
         return NextResponse.json({}, {
             status: 200
         })
@@ -129,8 +140,11 @@ export async function POST (req){
                 invoice_id: invoice.invoice_id
             }
         })
+        
+        let total_product = 0
+        let total_amount = 0
 
-        details.forEach(async (detail)=>{
+        for (const detail of details){
             const product = await prisma.pRODUCT.findFirst({
                 where: {
                     product_id: detail.product_id
@@ -146,8 +160,11 @@ export async function POST (req){
                     amount: product.amount - detail.amount
                 }
             })
-        })
+            total_product += detail.amount * product.price
+            total_amount += detail.amount
+        }
 
+        console.log(total_product);
         await prisma.iNVOICE.update({
             where: {
                 user_id: user.user_id,
@@ -155,7 +172,9 @@ export async function POST (req){
             },
             data:{
                 status_id: 1,
-                date_created: new Date()
+                date_created: new Date(),
+                total_amount: total_amount,
+                total_product: total_product
             }
         })
         
