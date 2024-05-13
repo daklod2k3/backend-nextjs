@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 0.tcp.ap.ngrok.io:17536
--- Generation Time: May 13, 2024 at 04:09 AM
+-- Generation Time: May 13, 2024 at 04:12 AM
 -- Server version: 8.4.0
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,8 @@ SET time_zone = "+00:00";
 --
 -- Database: `it-shop`
 --
+CREATE DATABASE IF NOT EXISTS `it-shop` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci;
+USE `it-shop`;
 
 -- --------------------------------------------------------
 
@@ -27,6 +29,7 @@ SET time_zone = "+00:00";
 -- Table structure for table `banner`
 --
 
+DROP TABLE IF EXISTS `banner`;
 CREATE TABLE `banner` (
   `banner_id` int NOT NULL,
   `image_url` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -49,6 +52,7 @@ INSERT INTO `banner` (`banner_id`, `image_url`, `open_url`) VALUES
 -- Table structure for table `category`
 --
 
+DROP TABLE IF EXISTS `category`;
 CREATE TABLE `category` (
   `category_id` int NOT NULL,
   `name` longtext COLLATE utf8mb4_unicode_ci
@@ -70,6 +74,7 @@ INSERT INTO `category` (`category_id`, `name`) VALUES
 -- Table structure for table `customer`
 --
 
+DROP TABLE IF EXISTS `customer`;
 CREATE TABLE `customer` (
   `customer_id` int NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -97,6 +102,7 @@ INSERT INTO `customer` (`customer_id`, `name`, `address`, `phone`, `personal_id`
 -- Table structure for table `employee`
 --
 
+DROP TABLE IF EXISTS `employee`;
 CREATE TABLE `employee` (
   `employee_id` int NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -114,6 +120,7 @@ CREATE TABLE `employee` (
 -- Table structure for table `function`
 --
 
+DROP TABLE IF EXISTS `function`;
 CREATE TABLE `function` (
   `function_id` int NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
@@ -126,6 +133,7 @@ CREATE TABLE `function` (
 -- Table structure for table `invoice`
 --
 
+DROP TABLE IF EXISTS `invoice`;
 CREATE TABLE `invoice` (
   `invoice_id` int NOT NULL,
   `employee_id` int DEFAULT NULL,
@@ -172,6 +180,7 @@ INSERT INTO `invoice` (`invoice_id`, `employee_id`, `user_id`, `status_id`, `dat
 -- Table structure for table `invoice_detail`
 --
 
+DROP TABLE IF EXISTS `invoice_detail`;
 CREATE TABLE `invoice_detail` (
   `id` int NOT NULL,
   `invoice_id` int NOT NULL,
@@ -228,6 +237,7 @@ INSERT INTO `invoice_detail` (`id`, `invoice_id`, `product_id`, `amount`, `total
 -- Table structure for table `invoice_status`
 --
 
+DROP TABLE IF EXISTS `invoice_status`;
 CREATE TABLE `invoice_status` (
   `status_id` int NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL
@@ -249,6 +259,7 @@ INSERT INTO `invoice_status` (`status_id`, `name`) VALUES
 -- Table structure for table `product`
 --
 
+DROP TABLE IF EXISTS `product`;
 CREATE TABLE `product` (
   `product_id` int NOT NULL,
   `vendor_id` int DEFAULT NULL,
@@ -281,6 +292,7 @@ INSERT INTO `product` (`product_id`, `vendor_id`, `name`, `price`, `img_url`, `a
 -- Table structure for table `role`
 --
 
+DROP TABLE IF EXISTS `role`;
 CREATE TABLE `role` (
   `role_id` int NOT NULL,
   `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL
@@ -301,6 +313,7 @@ INSERT INTO `role` (`role_id`, `name`) VALUES
 -- Table structure for table `role+function`
 --
 
+DROP TABLE IF EXISTS `role+function`;
 CREATE TABLE `role+function` (
   `role_id` int NOT NULL,
   `function_id` int NOT NULL,
@@ -313,6 +326,7 @@ CREATE TABLE `role+function` (
 -- Table structure for table `user`
 --
 
+DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
   `user_id` int NOT NULL,
   `username` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -341,6 +355,7 @@ INSERT INTO `user` (`user_id`, `username`, `password`, `date_created`, `status`,
 -- Table structure for table `vendor`
 --
 
+DROP TABLE IF EXISTS `vendor`;
 CREATE TABLE `vendor` (
   `name` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `vendor_id` int NOT NULL
