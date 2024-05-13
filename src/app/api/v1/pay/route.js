@@ -203,13 +203,31 @@ export async function GET (req){
                                 }, {})
     console.log(filter);
 
-    const invoice = await prisma.iNVOICE.findMany({
+    const invoices = await prisma.iNVOICE.findMany({
         where: {
             user_id: user.user_id,
             ...filter
         }
     })
 
-    return NextResponse.json(invoice)
+    // const products = []
+    // const amounts = []
+
+    // for (const invoice of invoices){
+    //     const detail = await prisma.iNVOICE_DETAIL.findFirst({
+    //         where: {
+    //             invoice_id: invoice.invoice_id
+    //         }
+    //     })
+    //     amounts.push(detail.amount)
+    //     const product = await prisma.pRODUCT.findFirst({
+    //         where: {
+    //             product_id: detail.product_id
+    //         }
+    //     })
+    //     products.push(product)
+    // }
+
+    return NextResponse.json(invoices)
 
 }
